@@ -138,7 +138,7 @@ async def GetSubjectListIGCSE() -> list[SimpleNamespace]:
     return extracted_subjects
 
 
-async def GetSubjectSessionsList(subjectURL) -> list[SimpleNamespace]:
+async def GetSubjectSessionsListIGCSE(subjectURL) -> list[SimpleNamespace]:
     """Checks the subject sessions list and returns the list for IGCSE level"""
     PageSource = await GetWebPageSource(subjectURL)
     soup = BeautifulSoup(PageSource, "html.parser")
@@ -166,7 +166,7 @@ async def GetSubjectSessionsList(subjectURL) -> list[SimpleNamespace]:
     return found_years
 
 
-async def GetSessionPapers(yearmonthURL) -> list[SimpleNamespace]:
+async def GetSessionPapersIGCSE(yearmonthURL) -> list[SimpleNamespace]:
     """Gets the papers from selected year, and returns a list of Simplenamespaces
     Gets Subject Code, month, type (ms, qp, ci), number (10, 11, 55, etc) and the download link
     """

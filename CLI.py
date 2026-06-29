@@ -70,7 +70,7 @@ class CLI:
                     Panel(Spinner("bouncingBall", text=f"Fetching data for {NameandCode}", style="green"), title=NameandCode)
                 )  
                 
-                self.SessionsList = await GetSubjectSessionsList(url)
+                self.SessionsList = await GetSubjectSessionsListIGCSE(url)
                     
                 if not self.SessionsList:
                     self.layout["left_panel"].update(Panel("Nothing Found \n Press any key to continue", title="Error"))
@@ -100,7 +100,7 @@ class CLI:
                     Panel(Spinner("bouncingBall", text=f"Fetching paper list for {year} {months}...", style="green"), title="Papers")
                 )
                 
-                self.PapersList = await GetSessionPapers(session_url)   
+                self.PapersList = await GetSessionPapersIGCSE(session_url)   
                 if Entertype == "CTRL-ENTER":
                     print("Download All Across Session")
                     
