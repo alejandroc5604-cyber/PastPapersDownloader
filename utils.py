@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from rich.panel import Panel
 import keyboard
 from playwright.async_api import async_playwright
+from types import SimpleNamespace
 
 class PickFromList:
     def __init__(self, OptionsList, UpdateTo):
@@ -16,22 +17,24 @@ class PickFromList:
         self.Chunked_list = list(batched(OptionsList, self.ChunkSize)) if OptionsList else []
         self.UpdateTo = UpdateTo
 
-    def generate_menu_renderable(self, title=None) -> Panel:
+    def UpdateMenu(self, title=None) -> Panel:
         if not self.OptionsList:
-            return Panel("No entries available.", title="Selection Menu")
+            return Panel("No entries available. \nPress any key to continue", title="Nothing Found")
         
         lines = []
+        
         batch_num = self.selected_index // self.ChunkSize
         relative_index = self.selected_index % self.ChunkSize
         
         if batch_num > len(self.Chunked_list) - 1:
             batch_num = len(self.Chunked_list) - 1
-            
         for idx, item in enumerate(self.Chunked_list[batch_num]):
+            
             if idx == relative_index:
                 lines.append(f"[blue] > [bold blue]{item}[/bold blue] [/blue]")
             else:
                 lines.append(f"  {item}")
+        lines.append("↓   ↓   ↓".center(len(max(self.Chunked_list[batch_num]))))
                 
         menu_content = "\n".join(lines)
         if not title:
@@ -45,7 +48,7 @@ class PickFromList:
         keys_to_check = ["up", "down", "enter"]
         
         while True:
-            self.UpdateTo.update(self.generate_menu_renderable())
+            self.UpdateTo.update(self.UpdateMenu())
             
             event = await asyncio.to_thread(keyboard.read_event)
             if event.event_type == keyboard.KEY_DOWN and event.name in keys_to_check:
@@ -95,7 +98,7 @@ def Sorter(SubjectCode, Year, Month: str, Course: Literal["IGCSE", "ALevel", "OL
     return path
 
 
-async def GetWebPage(URL, XPATH=None):
+async def GetWebPageSource(URL, XPATH=None):
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page()
@@ -110,11 +113,12 @@ async def GetWebPage(URL, XPATH=None):
         return pagecontent
 
 
-async def GetSubjectListIGCSE():
-    """Return a list of all the subjects and the set URLS for IGCSE level."""
+async def GetSubjectListIGCSE() -> list[SimpleNamespace]:
+    """Return a list of all the subjects and the set URLS for IGCSE level"""
     extracted_subjects = []
+    basepageurl = "https://pastpapers.papacambridge.com"
     mainpageurl = "https://pastpapers.papacambridge.com/papers/caie/igcse"
-    MainPage = await GetWebPage(mainpageurl, "/html/body/div[14]/div/form/div/div/div[2]/div[1]/div[3]/div[2]/h1")
+    MainPage = await GetWebPageSource(mainpageurl, "/html/body/div[14]/div/form/div/div/div[2]/div[1]/div[3]/div[2]/h1")
     soup = BeautifulSoup(MainPage, "html.parser")
     for link in soup.find_all("a"):
         href = link.get('href')
@@ -124,20 +128,22 @@ async def GetSubjectListIGCSE():
             m = re.search(r'igcse-(.*?)-(\d{4})', href)
             if not m:
                 continue
-            name = m.group(1).replace("-", " ").title()
-            code = m.group(2)
-            url = mainpageurl.replace("papers/caie/igcse", "") + str(href).replace(" ", "")
-            extracted_subjects.append((name, code, url))
+            Subject = SimpleNamespace()
+            
+            Subject.name = m.group(1).replace("-", " ").title()
+            Subject.code = m.group(2)
+            Subject.url = os.path.join(basepageurl, href)
+            extracted_subjects.append(Subject)
             
     return extracted_subjects
 
 
-async def GetYearExamsFromSubjectURL(subjectURL):
-    """Checks the page for the year past papers."""
-    PageSource = await GetWebPage(subjectURL)
+async def GetSubjectSessionsList(subjectURL) -> list[SimpleNamespace]:
+    """Checks the subject sessions list and returns the list for IGCSE level"""
+    PageSource = await GetWebPageSource(subjectURL)
     soup = BeautifulSoup(PageSource, "html.parser")
     found_years = []
-    mainpageurl = "https://pastpapers.papacambridge.com/papers/caie/igcse"
+    mainpageurl = "https://pastpapers.papacambridge.com/"
     for link in soup.find_all("a"):
         href = link.get("href")
         if href:
@@ -146,20 +152,26 @@ async def GetYearExamsFromSubjectURL(subjectURL):
             m = re.search(r"igcse-(.*?)-(\d{4})-(\d{4})-(.*$)", href)
             if not m:
                 continue
-            name = m.group(1)
-            code = m.group(2)
-            year = m.group(3)
-            months = m.group(4)
-            link = mainpageurl.replace("papers/caie/igcse", "") + str(href).replace(" ", "")
+            link = os.path.join(mainpageurl, href)
+            
+            Session = SimpleNamespace()
+            Session.name = m.group(1)
+            Session.SubjectCode = m.group(2)
+            Session.Year = m.group(3)
+            Session.Months = m.group(4)
+            Session.Link = link
+            
 
-            found_years.append((name, code, year, months, link))
+            found_years.append(Session)
     return found_years
 
 
-async def GetYearExamsFromYearMonthURL(yearmonthURL):
-    """Gets the papers from selected year."""
+async def GetSessionPapers(yearmonthURL) -> list[SimpleNamespace]:
+    """Gets the papers from selected year, and returns a list of Simplenamespaces
+    Gets Subject Code, month, type (ms, qp, ci), number (10, 11, 55, etc) and the download link
+    """
     downloadURLbasepath = "https://pastpapers.papacambridge.com"
-    PageSource = await GetWebPage(yearmonthURL) 
+    PageSource = await GetWebPageSource(yearmonthURL) 
     soup = BeautifulSoup(PageSource, "html.parser")
     found_papers = []
     
@@ -175,13 +187,13 @@ async def GetYearExamsFromYearMonthURL(yearmonthURL):
             if not match:
                 continue
                 
-            code = match.group(1)
-            month = match.group(2)      
-            doctype = match.group(3)   
-            paper_num = match.group(4) if match.group(4) else ""
-            download_link = downloadURLbasepath + "/" + href
-            filename = href.split("/")[-1]
-            
-            found_papers.append((code, month, doctype, paper_num, download_link, filename))
+            Paper = SimpleNamespace()
+            Paper.SubjectCode = match.group(1)
+            Paper.Month = match.group(2)
+            Paper.Type = match.group(3)
+            Paper.Number = match.group(4)
+            Paper.DownloadLink = os.path.join(downloadURLbasepath,href)
+            Paper.filename = os.path.basename(Paper.DownloadLink)
+            found_papers.append(Paper)
             
     return found_papers
