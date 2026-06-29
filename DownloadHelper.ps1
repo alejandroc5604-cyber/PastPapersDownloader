@@ -1,14 +1,3 @@
-<#
-.SYNOPSIS
-Downloads the PastPapersDownloader GitHub repository archive and extracts it locally.
-
-.DESCRIPTION
-This script is intended to be run from Win+R with PowerShell, for example:
-  powershell -ExecutionPolicy Bypass -File "C:\Path\To\download_pastpapers_downloader.ps1"
-
-.PARAMETER Destination
-Optional output folder where the repository is extracted. Defaults to the user's Downloads folder.
-#>
 
 param(
     [string]$Destination = "$env:USERPROFILE\Downloads\PastPapersDownloader"
@@ -34,7 +23,6 @@ try {
 
     Expand-Archive -Path $zipPath -DestinationPath $Destination -Force
 
-    # If archive creates a nested folder, move its contents up one level.
     $nestedFolder = Join-Path -Path $Destination -ChildPath 'PastPapersDownloader-main'
     if (Test-Path -Path $nestedFolder) {
         Get-ChildItem -Path $nestedFolder -Force | Move-Item -Destination $Destination -Force
@@ -42,6 +30,32 @@ try {
     }
 
     Write-Host "Repository downloaded and extracted successfully." -ForegroundColor Green
+
+    $setupPath = Join-Path -Path $Destination -ChildPath 'setup.py'
+    if (Test-Path -Path $setupPath) {
+        Write-Host "Running setup.py to install requirements..."
+        $pythonExe = Get-Command python -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
+        if (-not $pythonExe) {
+            $pythonExe = Get-Command py -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
+        }
+
+        if ($pythonExe) {
+            & $pythonExe $setupPath
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "setup.py finished with errors. Check the output above." -ForegroundColor Yellow
+            }
+            else {
+                Write-Host "setup.py completed successfully." -ForegroundColor Green
+            }
+        }
+        else {
+            Write-Host "Python executable not found in PATH. Please install Python and run setup.py manually." -ForegroundColor Yellow
+        }
+    }
+    else {
+        Write-Host "setup.py not found at $Destination. Please run setup.py manually if needed." -ForegroundColor Yellow
+    }
+
     Write-Host "Open the folder and run `python CLI.py` to start the project."
 }
 catch {

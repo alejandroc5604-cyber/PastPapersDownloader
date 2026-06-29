@@ -9,7 +9,6 @@ if __name__ == "__main__":
     
     print("Installing modules")
     try:
-        # sys.executable ensures the script uses the current Python environment's pip
         subprocess.check_call(
             [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
         )
