@@ -1,7 +1,6 @@
 import os
 import aiohttp
 import asyncio
-from rich.progress import Progress
 class Downloader():
     def __init__(self, starting_links=None, num_workers=4):
         self.queue = asyncio.Queue()

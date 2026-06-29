@@ -1,0 +1,7 @@
+aiohttp==3.13.3
+beautifulsoup4==4.15.0
+keyboard==0.13.5
+playwright==1.60.0
+readchar==4.2.2
+rich==15.0.0
+textual==8.2.7

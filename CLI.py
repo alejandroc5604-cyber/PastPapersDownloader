@@ -6,7 +6,6 @@ from rich.layout import Layout
 from rich.panel import Panel
 from rich.live import Live
 from rich.spinner import Spinner
-from textual.widgets import OptionList
 
 from utils import *
 from downloader import Downloader
