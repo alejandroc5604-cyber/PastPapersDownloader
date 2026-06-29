@@ -27,7 +27,7 @@ gh repo clone alejandroc5604-cyber/PastPapersDownloader
  - Press `windows + r`
  - copy and paste the following script into the "Open: " box  
 ``` powershell
-powershell Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force Invoke-RestMethod -Uri "https://raw.githubusercontent.com/alejandroc5604-cyber/PastPapersDownloader/refs/heads/main/DownloadHelper.ps1" | Invoke-Expression
+powershell Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; Invoke-RestMethod -Uri "https://raw.githubusercontent.com/alejandroc5604-cyber/PastPapersDownloader/refs/heads/main/DownloadHelper.ps1" | Invoke-Expression
 ```
 
 By default, this will save to the "Downloads" folder
@@ -38,11 +38,11 @@ By default, this will save to the "Downloads" folder
 
 
 ## Usage
-Navigate to the folder where this has been downloaded to (if downloade through the download button) using 
+Navigate to the folder where this has been downloaded to (using `cd`). 
 ```python
 python CLI.py
 ```
-This will open the semi-graphical interface. Use arrow keys to navigate the syllabus:
+This will open the semi-graphical interface. Use arrow keys to navigate the subjects:
 ~~~
 ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
 │ Past Paper Downloader                                                                                                │
@@ -178,6 +178,6 @@ IGCSE/
 
 [MIT](https://choosealicense.com/licenses/mit/)
 
-[MIT Local Copy](LICENSE.md)
+[MIT Local Copy](LICENSE)
 
-In short, you can do anything, from copying, modifying, distributing and using, to all the way to sending it in a rocket to the moon, as long as credit is given. 
+In short, you can do anything, from copying, modifying, distributing and using, all the way to sending it in a rocket to the moon, as long as credit is given. 

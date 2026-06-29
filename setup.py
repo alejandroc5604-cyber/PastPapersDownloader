@@ -5,7 +5,7 @@ import subprocess
 
 if __name__ == "__main__":
     if not os.path.isfile("requirements.txt"):
-        sys.exit(-1, "Requirements.txt not found")
+        sys.exit("requirements.txt not found")
     
     print("Installing modules")
     try:
