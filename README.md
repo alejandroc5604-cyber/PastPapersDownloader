@@ -1,5 +1,8 @@
 # Past Papers Downloader
-
+![Python](https://img.shields.io/badge/Python-3.12+-blue)
+![AsyncIO](https://img.shields.io/badge/AsyncIO-Enabled-green)
+![Rich](https://img.shields.io/badge/UI-Rich-purple)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
 
 Downloads past papers in bulk from [PapaCambridge](https://papacambridge.com/)
