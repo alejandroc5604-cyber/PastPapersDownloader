@@ -30,7 +30,7 @@ gh repo clone alejandroc5604-cyber/PastPapersDownloader
 powershell Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force; Invoke-RestMethod -Uri "https://raw.githubusercontent.com/alejandroc5604-cyber/PastPapersDownloader/refs/heads/main/DownloadHelper.ps1" | Invoke-Expression
 ```
 
-By default, this will save to the "Downloads" folder
+This will save to the "Downloads" folder
 
 <img width="401" height="209" alt="image" src="ReadMeImages/WindowsRunImage.png" />
 

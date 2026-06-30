@@ -10,9 +10,10 @@ from rich.spinner import Spinner
 from utils import *
 from downloader import Downloader
 import keyboard
+from warnings import deprecated
 
-
-class CLI:
+@deprecated("Too messy, starting switch towards the source manager")
+class CLIV1:
     def __init__(self):
         self.DownloaderWorkerNum = 3
         self.SessionsList = []
@@ -130,6 +131,7 @@ class CLI:
                     months = selected_paper.Month
                     download_link = selected_paper.DownloadLink
                     formatted_path = Sorter(code, year, months, "IGCSE")
+                    print(download_link)
                     await self.downloader.add_url(download_link, formatted_path)
                 
         except KeyboardInterrupt:
@@ -155,7 +157,6 @@ class CLI:
         self.layout["left_panel"].update(Panel(Spinner("bouncingBall", text="Fetching Subjects...", style="green"), title="Actions"))
         self.layout["right_panel"].update(Panel(Spinner("bouncingBall", text="Loading Downloaders...", style="green"), title="Downloaders"))
 
-        # Maintain a singular global active Live instance here
         with Live(self.layout, console=self.console, refresh_per_second=20):
             await self.main()
 
@@ -164,7 +165,7 @@ class CLI:
 
 
 async def MainRunner():
-    cli = CLI()
+    cli = CLIV1()
     await cli.setup()
 
 

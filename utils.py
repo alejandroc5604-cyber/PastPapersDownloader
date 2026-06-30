@@ -8,6 +8,7 @@ from rich.panel import Panel
 import keyboard
 from playwright.async_api import async_playwright
 from types import SimpleNamespace
+from warnings import deprecated
 
 class PickFromList:
     def __init__(self, OptionsList, UpdateTo):
@@ -98,6 +99,7 @@ def Sorter(SubjectCode, Year, Month: str, Course: Literal["IGCSE", "ALevel", "OL
     return path
 
 
+@deprecated("Too messy, starting switch towards the source manager")
 async def GetWebPageSource(URL, XPATH=None):
     async with async_playwright() as p:
         browser = await p.chromium.launch()
@@ -112,7 +114,7 @@ async def GetWebPageSource(URL, XPATH=None):
         await page.close()
         return pagecontent
 
-
+@deprecated("Too messy, starting switch towards the source manager")
 async def GetSubjectListIGCSE() -> list[SimpleNamespace]:
     """Return a list of all the subjects and the set URLS for IGCSE level"""
     extracted_subjects = []
@@ -136,8 +138,7 @@ async def GetSubjectListIGCSE() -> list[SimpleNamespace]:
             extracted_subjects.append(Subject)
             
     return extracted_subjects
-
-
+@deprecated("Too messy, starting switch towards the source manager")
 async def GetSubjectSessionsListIGCSE(subjectURL) -> list[SimpleNamespace]:
     """Checks the subject sessions list and returns the list for IGCSE level"""
     PageSource = await GetWebPageSource(subjectURL)
@@ -166,6 +167,7 @@ async def GetSubjectSessionsListIGCSE(subjectURL) -> list[SimpleNamespace]:
     return found_years
 
 
+@deprecated("Too messy, starting switch towards the source manager")
 async def GetSessionPapersIGCSE(yearmonthURL) -> list[SimpleNamespace]:
     """Gets the papers from selected year, and returns a list of Simplenamespaces
     Gets Subject Code, month, type (ms, qp, ci), number (10, 11, 55, etc) and the download link
